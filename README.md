@@ -31,6 +31,9 @@ GPT-4*  ████████████████████░░░░
         *口径不同, 不可直接比较, 详见下文「关于 GPT-4 基线」
 ```
 
+> 📊 更细的多维拆解（按年份/分值/题干长度、混淆矩阵、错误模式、置信度闸门收益）
+> 见 **[docs/analysis.md](docs/analysis.md)**。
+
 ## 分学科表现
 
 | 学科 | 题数 | 答对 | 准确率 | 平均置信度 | 平均耗时(秒) |
@@ -150,7 +153,9 @@ jev-gaokao-eval/
 │   ├── 02_convert_to_jev_format.py    格式转换 + 答案泄漏自检
 │   ├── 03_run_evaluation.py           调用 Jev API (断点续跑)
 │   ├── 04_analyze_and_export.py       统计 + 导出 Excel/Markdown
-│   └── 05_build_readme.py             由 summary.json 生成本文件
+│   ├── 05_build_readme.py             由 summary.json 生成本文件
+│   ├── 06_create_and_push.py          创建 GitHub 仓库并推送
+│   └── 07_deep_analysis.py            深度分析 -> docs/analysis.md
 ├── data/                      运行后生成: items.json / requests.json
 │   └── official/              官方原始数据 (不纳入版本控制)
 ├── results/
@@ -159,7 +164,8 @@ jev-gaokao-eval/
 │   ├── summary.json           全部统计量
 │   └── analysis_report.md     Markdown 分析报告
 └── docs/
-    └── methodology.md         完整方法论与局限说明
+    ├── methodology.md         完整方法论与局限说明
+    └── analysis.md            深度分析 (多维拆解/混淆矩阵/错误模式/闸门收益)
 ```
 
 ## 数据与口径说明
@@ -208,4 +214,4 @@ jev-gaokao-eval/
 
 ---
 
-*生成时间：2026-09-22 17:28 ｜ 全部数据来自真实 API 调用，无模拟值。*
+*生成时间：2026-09-22 17:31 ｜ 全部数据来自真实 API 调用，无模拟值。*
