@@ -10,7 +10,7 @@
     export GITHUB_TOKEN=ghp_xxx
     python 06_create_and_push.py --repo jev-gaokao-eval --desc "..." [--dry-run]
 """
-import argparse, json, os, subprocess, sys, urllib.error, urllib.request
+import argparse, json, os, re, subprocess, sys, urllib.error, urllib.request
 
 OWNER = os.environ.get('GITHUB_OWNER', 'kuaitoukuai')
 
@@ -32,15 +32,24 @@ def api(path, token, method='GET', body=None):
         return None, 'HTTP %d: %s' % (e.code, e.read().decode()[:300])
 
 
-def run(cmd, cwd=None, check=True):
-    print('  $ %s' % ' '.join(cmd))
+def run(cmd, cwd=None, check=True, hide=False):
+    """hide=True 时不回显命令内容 (用于含凭据的命令, 避免 token 进入日志)"""
+    if hide:
+        print('  $ <命令含凭据, 已隐去不回显>')
+    else:
+        print('  $ %s' % ' '.join(cmd))
     r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, encoding='utf-8')
-    if r.stdout.strip():
-        print('    ' + r.stdout.strip()[:400].replace('\n', '\n    '))
-    if r.stderr.strip():
-        print('    [stderr] ' + r.stderr.strip()[:300].replace('\n', '\n    '))
+    out, err = r.stdout.strip(), r.stderr.strip()
+    if hide:
+        # 输出里也可能带凭据 URL, 一律做脱敏
+        out = re.sub(r'://[^@/\s]+@', '://<credentials>@', out)
+        err = re.sub(r'://[^@/\s]+@', '://<credentials>@', err)
+    if out:
+        print('    ' + out[:400].replace('\n', '\n    '))
+    if err:
+        print('    [stderr] ' + err[:300].replace('\n', '\n    '))
     if check and r.returncode != 0:
-        raise RuntimeError('命令失败 (exit=%d): %s' % (r.returncode, ' '.join(cmd)))
+        raise RuntimeError('命令失败 (exit=%d)' % r.returncode)
     return r
 
 
@@ -123,12 +132,12 @@ def main():
         if not token:
             sys.exit('  无 PAT, 无法回退')
         https = 'https://%s:%s@github.com/%s/%s.git' % (OWNER, token, OWNER, args.repo)
-        run(['git', 'remote', 'set-url', 'origin', https], cwd=root)
-        run(['git', 'push', '-u', 'origin', 'main'], cwd=root)
-        # 推送后移除 URL 中的凭据
+        run(['git', 'remote', 'set-url', 'origin', https], cwd=root, hide=True)
+        run(['git', 'push', '-u', 'origin', 'main'], cwd=root, hide=True)
+        # 推送后立刻移除 URL 中的凭据, 避免残留在 .git/config
         run(['git', 'remote', 'set-url', 'origin',
              'https://github.com/%s/%s.git' % (OWNER, args.repo)], cwd=root)
-        print('  已移除 URL 中的 PAT')
+        print('  已移除 URL 中的 PAT (不再残留在 .git/config)')
     print('\n  完成: https://github.com/%s/%s' % (OWNER, args.repo))
 
 
