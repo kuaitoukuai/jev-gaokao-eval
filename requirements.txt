@@ -1,0 +1,6 @@
+# 本项目仅依赖 Python 标准库 + openpyxl（Excel 导出）
+# 其余全部使用标准库: urllib / json / re / statistics / collections
+#
+#   python -m pip install -r requirements.txt
+#
+openpyxl>=3.1.0

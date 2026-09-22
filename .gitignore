@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.python-version
+
+# 数据文件（体积较大，请用 scripts/01_download_official_data.py 自行下载）
+data/official/
+data/*.tmp
+
+# 题库中间产物（含答案标注，可由 scripts/02 从官方数据重建）
+# 仓库只保留 data/requests.json —— 纯请求体、零答案字段，是真正的评测输入
+data/items.json
+data/parse_report.txt
+
+# 结果中间产物
+results/*.partial.json
+
+# 凭据与敏感文件
+.env
+.env.*
+*_pat.tmp
+_pat.tmp
+credentials.json
+*.key
+*.pem
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
